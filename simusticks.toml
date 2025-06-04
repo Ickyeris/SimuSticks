@@ -1,0 +1,13 @@
+[project]
+name = "simusticks"
+version = "0.1"
+description = "Rematch Controller/Mouse input aggregator"
+
+[tool.cxfreeze]
+executables = [
+    {script = "main.py", base = "pygame"}
+]
+
+[tool.cxfreeze.build_exe]
+excludes = ["tkinter", "unittest"]
+zip_include_packages = ["encodings", "PySide6", "shiboken6"]
