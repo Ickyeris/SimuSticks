@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import Button from "../ui/Button";
 
 import { useInputEvent } from "../../hooks/useInputEvent";
+import { InputType } from "../../hooks/InputEventBus";
 
 import KeyboardIcon from "@mui/icons-material/Keyboard";
 import CloseIcon from "@mui/icons-material/Close";
@@ -10,27 +11,51 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 const InputEventNode = () => {
   const [inputs, setInputs] = useState([""]);
   const [listeningIndex, setListeningIndex] = useState(-1);
+  const [inputsHidden, setInputsHidden] = useState(false);
+  const [pressedInputs, setPressedInputs] = useState(new Map());
 
-  useInputEvent(
-    "keyDown",
-    (e) => {
-      if (e.code != "Escape") {
-      const newInputs = [...inputs];
-      newInputs[listeningIndex] = e.code;
-      setInputs(newInputs);
+  const [active, setActive] = useState(false)
+
+  useInputEvent("keyDown", (e: InputType) => {
+      const isEscape = e.name === "Escape";
+      if (isEscape) {
+        return;
       }
-      setListeningIndex(-1);
-    },
-    listeningIndex != -1
-  );
-
-  useInputEvent(
-    "mouseDown",
-    (e) => {
-      console.log(e);
+      if (listeningIndex != -1 && !inputs.includes(e.name)) {
+        const newInputs = [...inputs];
+        newInputs[listeningIndex] = e.name;
+        setInputs(newInputs);
+        setListeningIndex(-1);  
+      }
+      else if (inputs.includes(e.name)) {
+        const newPressedInputs = new Map(pressedInputs);
+        newPressedInputs.set(e.name, e);
+        setPressedInputs(newPressedInputs);
+        updateActiveState(newPressedInputs);
+      }
     },
     true
   );
+
+  useInputEvent("keyUp", (e: InputType) => {
+      if (inputs.includes(e.name)) {
+        const newPressedInputs = new Map(pressedInputs);
+        newPressedInputs.delete(e.name);
+        setPressedInputs(newPressedInputs);
+        updateActiveState(newPressedInputs);
+      }
+    },
+    true
+  );
+
+  const updateActiveState = (newPressedInputs: any) => {
+    if (inputs.some(str => newPressedInputs.has(str))) {
+      setActive(true);
+    }
+    else {
+      setActive(false);
+    }
+  }
 
   const handleAddInput = () => {
     setInputs([...inputs, ""]);
@@ -43,7 +68,7 @@ const InputEventNode = () => {
   };
 
   return (
-    <div className="drag-handle__label flex flex-col border-2 border-black box-border bg-white">
+    <div className={`cursor-default flex flex-col border-2 border-black box-border ${active ? 'bg-green-200' : 'bg-white'}`}>
       {/* Title Bar */}
       <div className="drag-handle__custom flex items-center justify-between p-1 bg-gray-300 gap-2">
         <h1 className="font-bold">Input Event</h1>
@@ -75,7 +100,7 @@ const InputEventNode = () => {
                   <div className="w-full">
                   {listeningIndex == index ? "Listening..." : value ? value : <span className="text-gray-400">Empty</span>}
                   </div>
-                  <div onPointerUp={() => handleRemoveInput(index)} className="hover:bg-gray-500">
+                  <div onPointerUp={() => handleRemoveInput(index)} className="hover:bg-gray-200">
                     <CloseIcon/>
                   </div>
                 </div>

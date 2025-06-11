@@ -4,13 +4,11 @@ import '@xyflow/react/dist/style.css';
 
 import MessageNode from './components/nodes/MessageNode';
 import InputEventNode from './components/nodes/InputEventNode';
-import BasicNode from './components/nodes/BasicNode';
 
 
 const nodeTypes = {
   message: MessageNode,
   inputevent: InputEventNode,
-  basic: BasicNode,
 };
 
 const initialNodes = [

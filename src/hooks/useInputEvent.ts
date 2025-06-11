@@ -1,9 +1,9 @@
-import { useEffect } from 'react';
-import { inputEventBus } from './InputEventBus';
+import { useEffect } from "react";
+import { inputEventBus, InputType } from "./InputEventBus";
 
 export const useInputEvent = (
-  type: 'keyDown' | 'keyUp' | 'mouseDown' | 'mouseUp',
-  handler: (e: KeyboardEvent | MouseEvent) => void,
+  type: "keyDown" | "keyUp" | "mouseDown" | "mouseUp",
+  handler: (e: InputType) => void,
   active: boolean
 ) => {
   useEffect(() => {
