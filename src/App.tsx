@@ -1,12 +1,50 @@
-import { useState } from "react";
-import Canvas from "./components/Canvas";
+import { useRef } from 'react';
+import { ReactFlow, ReactFlowProvider, Background, useNodesState } from '@xyflow/react';
+import '@xyflow/react/dist/style.css';
 
-function App() {
+import MessageNode from './components/nodes/MessageNode';
+import InputEventNode from './components/nodes/InputEventNode';
+import BasicNode from './components/nodes/BasicNode';
+
+
+const nodeTypes = {
+  message: MessageNode,
+  inputevent: InputEventNode,
+  basic: BasicNode,
+};
+
+const initialNodes = [
+  {
+    id: 'node-1',
+    type: 'inputevent',
+    data: {},
+    position: { x: 0, y: 450 },
+    dragHandle: '.drag-handle__custom',
+  },
+];
+ 
+const nodeOrigin: [number, number] = [0.5, 0];
+
+const App = () => {
+  const reactFlowWrapper = useRef(null);
+  
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+
+
   return (
-    <main className="w-full h-dvh bg-gray-200">
-      <Canvas></Canvas>
-      <div className="fixed top-0 w-full h-8 bg-black"></div>
-    </main>
+    <ReactFlowProvider>
+      <div className='wrapper w-full h-dvh' ref={reactFlowWrapper}>
+        <ReactFlow 
+        nodes={nodes}
+        onNodesChange={onNodesChange}
+        nodeTypes={nodeTypes}
+        nodeOrigin={nodeOrigin}
+        fitView
+        
+        />
+        <Background/>
+      </div>
+    </ReactFlowProvider>
   );
 }
 
